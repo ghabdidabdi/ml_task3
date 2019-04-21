@@ -22,7 +22,7 @@ sys.stdout = open('trainlog.log', 'w')
 train = pd.read_hdf("train.h5", "train")
 test = pd.read_hdf("test.h5", "test")
 index = test.index
-features = train.drop(['y'], axis = 1)
+features = train.drop(['y'], axis = 1).values
 
 ##########################
 ### eliminate outliers ###
