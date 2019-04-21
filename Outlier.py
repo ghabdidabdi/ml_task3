@@ -32,7 +32,9 @@ features = train.drop(['y'], axis = 1)
 outlier_clf = LocalOutlierFactor(n_neighbors = 21, # looking at 21 neighbors, since 21 is not divisible by 5
                                  contamination = 0.1 # how much data is assumed to be contaminated
 )
+print("training model for outliers")
 y_pred = outlier_clf.fit_predict(features)
+print("outliers detected, removing them")
 
 # remove outliers
 pca_in = []
@@ -42,11 +44,13 @@ for i in range(len(features)):
     if y_pred == 1:
         y.append(test.y[i])
         pca_in.append(features[i])
+print("outliers removed")
 
 ######################
 ### Normalize data ###
 ######################
 
+print("normalizing data")
 X = StandardScaler().fit_transform(pca_in)
 test = StandardScaler().fit_transform(test)
 
