@@ -19,31 +19,42 @@ import sys
 sys.stdout = open('trainlog.log', 'w')
 
 # read data
-train = pd.read_hdf("train.h5", "train")
+train_og = pd.read_hdf("train.h5", "train")
 test = pd.read_hdf("test.h5", "test")
 index = test.index
-features = train.drop(['y'], axis = 1).values
 
 ##########################
 ### eliminate outliers ###
 ##########################
 
-# create outlier classifier
-outlier_clf = LocalOutlierFactor(n_neighbors = 21, # looking at 21 neighbors, since 21 is not divisible by 5
-                                 contamination = 0.1 # how much data is assumed to be contaminated
-)
-print("training model for outliers")
-y_pred = outlier_clf.fit_predict(features)
-print("outliers detected, removing them")
+# define outlier configuration
+N_NEIGHBORS = 21
+CONTAMINATION = 0.01
+
+# try reading a csv
+y_pred = []
+filename = 'Outlier_n={}_c={}.csv'.format(N_NEIGHBORS, CONTAMINATION)
+try:
+    out_frame = pd.read_csv(filename)
+    y_pred = out_frame.Out
+except FileNotFoundException:
+    print('file was not found :(')
+    exit()
+
+# # create outlier classifier
+# outlier_clf = LocalOutlierFactor(n_neighbors = 21, # looking at 21 neighbors, since 21 is not divisible by 5
+#                                  contamination = 0.1 # how much data is assumed to be contaminated
+# )
+# print("training model for outliers")
+# y_pred = outlier_clf.fit_predict(features)
+# print("outliers detected, removing them")
+
+# insert outlier-column
+train_og.insert(0, column = 'outlier', value = y_pred)
 
 # remove outliers
-pca_in = []
-y = []
-
-for i in range(len(features)):
-    if y_pred[i] == 1:
-        y.append(train.y[i])
-        pca_in.append(features[i])
+train = train_og[train.outlier == 1]
+features = train.drop(['y'], axis = 1).values
 print("outliers removed")
 
 ######################
@@ -51,7 +62,7 @@ print("outliers removed")
 ######################
 
 print("normalizing data")
-X = StandardScaler().fit_transform(pca_in)
+pca_in = StandardScaler().fit_transform(features)
 test = StandardScaler().fit_transform(test)
 
 ##########################
@@ -61,16 +72,13 @@ test = StandardScaler().fit_transform(test)
 RANDOM = 42
 DIM = 70
 
-# creat input for PCA
-pca_in = train.drop(['y'], axis = 1)
-
 # create and fit PCA-model
 print()
 print()
 print('Starting PCA for ', DIM, ' dimensions')
 pca = PCA(n_components = DIM, random_state = RANDOM)
 
-X = pca.fit_transform(X)
+X = pca.fit_transform(pca_in)
 test = pca.transform(test)
 
 print()
