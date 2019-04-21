@@ -42,7 +42,7 @@ y = []
 
 for i in range(len(features)):
     if y_pred[i] == 1:
-        y.append(test.y[i])
+        y.append(train.y[i])
         pca_in.append(features[i])
 print("outliers removed")
 
