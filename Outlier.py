@@ -15,13 +15,8 @@ from sklearn.neighbors import LocalOutlierFactor
 #####################
 ### set up logger ###
 #####################
-import sys
-sys.stdout = open('trainlog.log', 'w')
-
-# read data
-train_og = pd.read_hdf("train.h5", "train")
-test = pd.read_hdf("test.h5", "test")
-index = test.index
+# import sys
+# sys.stdout = open('trainlog.log', 'w')
 
 ##########################
 ### eliminate outliers ###
@@ -29,48 +24,72 @@ index = test.index
 
 # define outlier configuration
 N_NEIGHBORS = 21
-CONTAMINATION = 0.01
+CONTAMINATION = 0.1
 
 # try reading a csv
 y_pred = []
-filename = 'Outlier_n={}_c={}.csv'.format(N_NEIGHBORS, CONTAMINATION)
+filename = 'Outlier_multy_n={}_c={}.csv'.format(N_NEIGHBORS, CONTAMINATION)
 try:
     out_frame = pd.read_csv(filename)
     y_pred = out_frame.Out
-except FileNotFoundException:
-    print('file was not found :(')
-    exit()
+except FileNotFoundError:
+    # file was not found, create and train new model, then print results to csv
+    print('file ', filename, ' was not found :(')
+    print('new file will be generated')
+    print()
+    print('create new classifier')
+    outlier_clf = LocalOutlierFactor(n_neighbors = N_NEIGHBORS,
+                                    contamination = CONTAMINATION
+    )
+    print("training model for corruption: ", CONTAMINATION, ', neighbors: ', N_NEIGHBORS)
+    y_pred = outlier_clf.fit_predict(features)
+    print("outliers detected, creating csv")
 
-# # create outlier classifier
-# outlier_clf = LocalOutlierFactor(n_neighbors = 21, # looking at 21 neighbors, since 21 is not divisible by 5
-#                                  contamination = 0.1 # how much data is assumed to be contaminated
-# )
-# print("training model for outliers")
-# y_pred = outlier_clf.fit_predict(features)
-# print("outliers detected, removing them")
+    # create new frame and print it to csv
+    f = pd.DataFrame({'Out': y_pred})
+    f.to_csv(filename)
+
+# read data
+train_og = pd.read_hdf("train.h5", "train")
+all_data = pd.read_hdf("train.h5", "train").drop(['y'], axis = 1)
 
 # insert outlier-column
 train_og.insert(0, column = 'outlier', value = y_pred)
 
+# NOTE: split here
+train_og, X_test = train_test_split(train_og, test_size=0.33)
+
+# train_og = pd.read_hdf("train.h5", "train")
+y_test = X_test.y
+X_test = X_test.drop(['y', 'outlier'], axis = 1)
+
+test = pd.read_hdf("test.h5", "test")
+index = test.index
+
 # remove outliers
-train = train_og[train.outlier == 1]
-features = train.drop(['y'], axis = 1).values
+train = train_og[train_og.outlier >= 0]
+features = train.drop(['y', 'outlier'], axis = 1).values
+y = train.pop('y')
 print("outliers removed")
 
 ######################
 ### Normalize data ###
 ######################
 
-print("normalizing data")
-pca_in = StandardScaler().fit_transform(features)
-test = StandardScaler().fit_transform(test)
+pca_in = features
+# print("normalizing data")
+# pca_in = StandardScaler().fit_transform(features)
+# test = StandardScaler().fit_transform(test)
+
+# # testset
+# X_test = StandardScaler().fit_transform(X_test)
 
 ##########################
 ### PCA- preprocessing ###
 ##########################
 
 RANDOM = 42
-DIM = 70
+DIM = 120
 
 # create and fit PCA-model
 print()
@@ -78,13 +97,18 @@ print()
 print('Starting PCA for ', DIM, ' dimensions')
 pca = PCA(n_components = DIM, random_state = RANDOM)
 
-X = pca.fit_transform(pca_in)
-test = pca.transform(test)
+pca.fit(all_data.values)
+# X = pca.fit_transform(pca_in)
+# test = pca.transform(test)
+X = pca_in
+
+# testset
+# X_test = pca.fit_transform(X_test)
 
 print()
 print()
-print('PCA Done, ', pca.explained_variance_ratio_, ' explained')
-print('sum: ', sum(pca.explained_variance_ratio_))
+# print('PCA Done, ', pca.explained_variance_ratio_, ' explained')
+# print('sum: ', sum(pca.explained_variance_ratio_))
 
 ###########################
 ### tensorflow learning ###
@@ -114,10 +138,10 @@ model1.name = 'model1'
 model2 = keras.Sequential([
     keras.layers.Dense(120, activation=tf.nn.relu, input_dim=DIM),
     keras.layers.Dense(120, activation=tf.nn.tanh),
-    keras.layers.Dropout(0.4),
+    # keras.layers.Dropout(0.1),
     keras.layers.Dense(120, activation=tf.nn.relu),
     keras.layers.Dense(120, activation=tf.nn.relu),
-    keras.layers.Dropout(0.4),
+    # keras.layers.Dropout(0.1),
     keras.layers.Dense(5, activation=tf.nn.softmax)
 ])
 model2.name = 'model2'
@@ -191,11 +215,20 @@ best_model = model2
 
 # print('Best Model: ' + best_model.name + '; accuracy = ' + str(best_acc))
 
-best_model.fit(X, y,  epochs = 75,
+best_model.fit(X, y,  epochs = 150,
                verbose = 2
 )
+
+res = best_model.evaluate(X_test, y_test)
+
+print('performance:')
+print(res)
+
+# NOTE: exit here, just for evaluation
+exit()
 y_pred = best_model.predict_classes(test)
 
+resname = 'res_outlier_n={}_c={}.csv'.format(N_NEIGHBORS, CONTAMINATION)
 resf = pd.DataFrame({'Id': index, 'y': y_pred})
-resf.to_csv('res_outlier.csv', index = False)
+resf.to_csv(resname, index = False)
 print('Done')

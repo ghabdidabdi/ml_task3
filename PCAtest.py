@@ -5,8 +5,8 @@ trying out PCA from sklearn
 #####################
 ### set up logger ###
 #####################
-import sys
-sys.stdout = open('trainlog.log', 'w')
+# import sys
+# sys.stdout = open('trainlog.log', 'w')
 # import logging
 
 # # conf. and creat logger
@@ -24,7 +24,7 @@ DIM = 40
 
 # imports
 import pandas as pd
-from sklearn.decomposition import PCA
+from sklearn.decomposition import KernelPCA
 
 # read data
 train = pd.read_hdf("train.h5", "train")
@@ -37,20 +37,17 @@ pca_in = train.drop(['y'], axis = 1)
 # create and fit PCA-model
 print()
 print()
-print('Starting PCA for ', DIM, ' dimensions')
-pca = PCA(n_components = DIM, random_state = RANDOM)
-# dims = []
-# for i in range(1, 121):
-#     pca = PCA(n_components = i, random_state = RANDOM)
-#     X = pca.fit_transform(pca_in)
-#     # y = train.pop('y').values
-#     # test = pca.transform(test)
-#     print(i, ': ', sum(pca.explained_variance_ratio_))
-#     dims.append(sum(pca.explained_variance_ratio_))
 
+print('Starting PCA for ', DIM, ' dimensions')
+pca = KernelPCA(n_components = DIM, random_state = RANDOM, kernel = 'rbf')
+
+print('fitting done :D')
+
+# apply transformation
 X = pca.fit_transform(pca_in)
 y = train.pop('y').values
 test = pca.transform(test)
+print('data transformed')
 
 # f = pd.DataFrame({'Dim': list(range(1, 121)), 'ratio': dims})
 # f.to_csv('ratio.csv', index = False)
@@ -158,17 +155,19 @@ for model in models:
     results[model] = model.evaluate(X_test, y_test,
               verbose = 2
     )
+    print(model.name, ':')
+    print(results[model])
 
 
-best_acc = 0.0
+# best_acc = 0.0
 
-for result in results:
-    print(results.get(result))
-    if results.get(result)[1] > best_acc:
-        best_acc = results.get(result)[1]
-        best_model = result
+# for result in results:
+#     print(results.get(result))
+#     if results.get(result)[1] > best_acc:
+#         best_acc = results.get(result)[1]
+#         best_model = result
 
-print('Best Model: ' + best_model.name + '; accuracy = ' + str(best_acc))
+# print('Best Model: ' + best_model.name + '; accuracy = ' + str(best_acc))
 
 # best_model.fit(X, y,  epochs = 200,
 #                verbose = 2
