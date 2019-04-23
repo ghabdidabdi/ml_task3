@@ -17,13 +17,16 @@ def drop_outliers(Iframe, ratio):
     '''drop given rate of outliers for labels 0..4'''
     # copy frame
     res = Iframe.copy()
+    print('call, for ratio: ', ratio)
 
     # split frame
     partitions = [Iframe[Iframe.y == i] for i in range(5)]
-    lables = [[] for i in range(5)]
+    labels = [[] for i in range(5)]
 
     # main loop
     for i in range(5):
+        print('examining label ', i)
+
         p = partitions[i]
         # train and predict
         clf = LocalOutlierFactor(contamination = ratio)
@@ -34,11 +37,12 @@ def drop_outliers(Iframe, ratio):
 
         # now drop
         p = p[p.outlier != -1]
-        partitions[i] = p.drop(['y'], axis = 1).values
+        partitions[i] = p.drop(['y', 'outlier'], axis = 1).values
         labels[i] = p.y
 
     # create v_stack for returning
-    res = (np.vstack(partitions), np.vstack(labels))
+    res = (np.vstack(partitions),
+            np.concatenate(labels))
     return res
 
 train = pd.read_hdf("train.h5", "train")
@@ -69,19 +73,20 @@ for cont in c:
         keras.layers.Dropout(0.1),
         keras.layers.Dense(5, activation=tf.nn.softmax),
     ])
-    model.name = 'model: contamination =  ' + str(cont)
+    model.name = 'model' + str(cont)
 
     model.compile(optimizer='adam',
                 loss='sparse_categorical_crossentropy',
                 metrics=['accuracy'])
 
     ### drop outliers
-    tmp = X_test.copy()
-    tmp.insert(0, column = 'y', value = y_test)
+    tmp = pd.DataFrame(data = X_train.copy())
+    tmp.insert(0, column = 'y', value = y_train)
 
     X_curr, y_curr = drop_outliers(tmp, cont)
 
-    model.fit(X, y, epochs = 200)
+    # model.fit(X_curr, y_curr, epochs = 50)
+    model.fit(X_curr, y_curr, epochs = 50)
 
     results[cont] = model.evaluate(X_test, y_test)
     print("done with ", model.name)
