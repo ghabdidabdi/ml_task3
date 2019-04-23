@@ -59,9 +59,11 @@ test = StandardScaler().fit_transform(test)
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.33, random_state=42)
 
 # list of ratios for contamination
-c = [0.001, 0.01, 0.1, 0.15, 0.2]
+# c = [0.001, 0.01, 0.1, 0.15, 0.2]
+c = [0.001]
 
 results = {}
+model = 0
 for cont in c:
     ## generate model
     model = keras.Sequential([
@@ -80,13 +82,13 @@ for cont in c:
                 metrics=['accuracy'])
 
     ### drop outliers
-    tmp = pd.DataFrame(data = X_train.copy())
-    tmp.insert(0, column = 'y', value = y_train)
+    tmp = pd.DataFrame(data = X.copy())
+    tmp.insert(0, column = 'y', value = y)
 
     X_curr, y_curr = drop_outliers(tmp, cont)
 
     # model.fit(X_curr, y_curr, epochs = 50)
-    model.fit(X_curr, y_curr, epochs = 50)
+    model.fit(X_curr, y_curr, epochs = 200)
 
     results[cont] = model.evaluate(X_test, y_test)
     print("done with ", model.name)
@@ -95,8 +97,6 @@ for cont in c:
 
 
 # results ={}
-
-# for model in models:
 
 # # exit()
 
@@ -107,12 +107,13 @@ for cont in c:
 #     if results.get(result)[1] > best_acc:
 #         best_acc = results.get(result)[1]
 #         best_model = result
+best_model = model
 
 # print('Best Model: ' + best_model.name + '; accuracy = ' + str(best_acc))
 
 # # best_model.fit(X, y,  epochs = 20)
-# y_pred = best_model.predict_classes(test)
+y_pred = best_model.predict_classes(test)
 
-# resf = pd.DataFrame({'Id': index, 'y': y_pred})
-# resf.to_csv('resTue_Apr_23_18:19:23_CEST_2019.csv', index = False)
-# print('Done')
+resf = pd.DataFrame({'Id': index, 'y': y_pred})
+resf.to_csv('resDie_Apr_23_21:35:35_CEST_2019.csv', index = False)
+print('Done')
