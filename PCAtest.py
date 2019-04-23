@@ -41,10 +41,12 @@ print()
 print('Starting PCA for ', DIM, ' dimensions')
 pca = KernelPCA(n_components = DIM, random_state = RANDOM, kernel = 'rbf')
 
-print('fitting done :D')
 
 # apply transformation
-X = pca.fit_transform(pca_in)
+pca.fit(pca_in)
+X = pca.transform(pca_in)
+print('fitting done :D')
+
 y = train.pop('y').values
 test = pca.transform(test)
 print('data transformed')
