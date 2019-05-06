@@ -23,8 +23,8 @@ logfilename = 'logfile_autoenc_{},{},{},{}.log'.format(now.month, now.day, now.h
 
 # setup logger
 FORMAT = '%(asctime)-15s %(clientip)s %(user)-8s %(message)s'
-logging.basicConfig(format=FORMAT, level=10)
-LOGGER = logging.getLogger(logfilename)
+logging.basicConfig(format=FORMAT, level=10, filename = logfilename)
+LOGGER = logging.getLogger()
 
 def main(dim = 70):
     global Local, LOGGER
