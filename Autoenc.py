@@ -19,7 +19,7 @@ from datetime import datetime as dt
 
 # compute name for log-file
 now = dt.now()
-logfilename = 'logfile_autoenc_{},{},{},{}.log'.format(now.month, now.day, now.hour, n.minute)
+logfilename = 'logfile_autoenc_{},{},{},{}.log'.format(now.month, now.day, now.hour, now.minute)
 
 # setup logger
 FORMAT = '%(asctime)-15s %(clientip)s %(user)-8s %(message)s'
@@ -113,7 +113,8 @@ def main(dim = 70):
 
         LOGGER.info('evaluation done, results:')
         LOGGER.info(results)
-        LOGGER.info('timestamp: ' + '{}, {}, {}'.format(now.month, now.day, now.hour, n.minute))
+        now = dt.now()
+        LOGGER.info('timestamp: ' + '{}, {}, {}'.format(now.month, now.day, now.hour, now.minute))
     else:
         # otherwise predict test-set and print to csv
         y_pred = model.predict_classes(test)
@@ -122,7 +123,7 @@ def main(dim = 70):
         # get the filename:
         # import datetime.datetime as dt
         now = dt.now()
-        filename = 'Results_task3_{}_{}_{}_{}.csv'.format(now.month, now.day, now.hour, n.minute)
+        filename = 'Results_task3_{}_{}_{}_{}.csv'.format(now.month, now.day, now.hour, now.minute)
         resf.to_csv(filename, index = False)
         print('Done')
 
