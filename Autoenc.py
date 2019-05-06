@@ -15,7 +15,7 @@ from keras.models import Model
 
 # create logger-file
 import logging
-import datetime.datetime as dt
+from datetime import datetime as dt
 
 # compute name for log-file
 now = dt.now()
