@@ -75,12 +75,12 @@ for model in models:
                 loss='sparse_categorical_crossentropy',
                 metrics=['accuracy'])
 #
-    model.fit(X_train, y_train, epochs = 200)
+    model.fit(X, y, epochs = 200)
     results[model] = model.evaluate(X_test, y_test)
     print("done :D")
     print(results[model])
 
-exit()
+# exit()
 
 best_acc = 0.0
 
@@ -92,9 +92,9 @@ for result in results:
 
 print('Best Model: ' + best_model.name + '; accuracy = ' + str(best_acc))
 
-best_model.fit(X, y,  epochs = 20)
+# best_model.fit(X, y,  epochs = 20)
 y_pred = best_model.predict_classes(test)
 
 resf = pd.DataFrame({'Id': index, 'y': y_pred})
-resf.to_csv('res.csv', index = False)
+resf.to_csv('resTue_Apr_23_18:19:23_CEST_2019.csv', index = False)
 print('Done')

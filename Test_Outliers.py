@@ -90,9 +90,9 @@ for cont in c:
     # model.fit(X_curr, y_curr, epochs = 50)
     model.fit(X_curr, y_curr, epochs = 200)
 
-    results[cont] = model.evaluate(X_test, y_test)
-    print("done with ", model.name)
-    print(results[cont])
+    # results[cont] = model.evaluate(X_test, y_test)
+    # print("done with ", model.name)
+    # print(results[cont])
 
 
 

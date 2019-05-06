@@ -25,6 +25,11 @@ DIM = 40
 # imports
 import pandas as pd
 from sklearn.decomposition import KernelPCA
+import tensorflow as tf
+import keras
+import numpy as np
+from sklearn.preprocessing import StandardScaler
+from sklearn.model_selection import train_test_split
 
 # read data
 train = pd.read_hdf("train.h5", "train")
@@ -32,7 +37,11 @@ test = pd.read_hdf("test.h5", "test")
 index = test.index
 
 # creat input for PCA
-pca_in = train.drop(['y'], axis = 1)
+X = train.drop(['y'], axis = 1)
+y = train.pop('y').values
+
+# split data
+X_pca, nothing, whatever, donotcare = train_test_split(X, y, test_size=0.9, random_state=RANDOM)
 
 # create and fit PCA-model
 print()
@@ -43,11 +52,10 @@ pca = KernelPCA(n_components = DIM, random_state = RANDOM, kernel = 'rbf')
 
 
 # apply transformation
-pca.fit(pca_in)
-X = pca.transform(pca_in)
+pca.fit(X_pca)
+X = pca.transform(X)
 print('fitting done :D')
 
-y = train.pop('y').values
 test = pca.transform(test)
 print('data transformed')
 
@@ -55,10 +63,11 @@ print('data transformed')
 # f.to_csv('ratio.csv', index = False)
 # exit()
 # PCA done
-print()
-print()
-print('PCA Done, ', pca.explained_variance_ratio_, ' explained')
-print('sum: ', sum(pca.explained_variance_ratio_))
+
+# print()
+# print()
+# print('PCA Done, ', pca.explained_variance_ratio_, ' explained')
+# print('sum: ', sum(pca.explained_variance_ratio_))
 
 ###########################
 ### tensorflow learning ###
@@ -68,11 +77,6 @@ import warnings
 warnings.filterwarnings("ignore")
 
 # import pandas as pd
-import tensorflow as tf
-import keras
-import numpy as np
-from sklearn.preprocessing import StandardScaler
-from sklearn.model_selection import train_test_split
 
 X = StandardScaler().fit_transform(X)
 test = StandardScaler().fit_transform(test)
