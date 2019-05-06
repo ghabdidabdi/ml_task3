@@ -56,7 +56,7 @@ def main(dim = 70):
 
     # create intermediate encodinglayer
     interm_dim = 240
-    interm_enc = Dense(interm_dim), activation = 'sigmoid'(i_layer)
+    interm_enc = Dense(interm_dim, activation = 'sigmoid')(i_layer)
 
     # create encoded layer
     # e_layer = Dense(enc_dim, activation = 'relu')(i_layer)
