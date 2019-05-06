@@ -115,7 +115,7 @@ def main(dim = 70):
         LOGGER.info('evaluation done, results:')
         LOGGER.info(results)
         now = dt.now()
-        LOGGER.info('timestamp: ' + '{}, {}, {}'.format(now.month, now.day, now.hour, now.minute))
+        LOGGER.info('timestamp: ' + '{}, {}, {}\n\n'.format(now.month, now.day, now.hour, now.minute))
     else:
         # otherwise predict test-set and print to csv
         y_pred = model.predict_classes(test)
