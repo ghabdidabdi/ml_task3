@@ -1,6 +1,20 @@
 # local flag: train and evaluate locally, or train locally and evaluate online
 Local = True
 
+# create logger-file
+import logging
+from datetime import datetime as dt
+
+# compute name for log-file
+now = dt.now()
+logfilename = 'logfile_autoenc_{}_{}_{}_{}.log'.format(now.month, now.day, now.hour, now.minute)
+
+# setup logger
+logging.basicConfig(level=10, filename = logfilename)
+LOGGER = logging.getLogger()
+LOGGER.info('tst')
+
+# exit()
 # standard imports
 import pandas as pd
 import keras
@@ -12,19 +26,6 @@ from sklearn.model_selection import train_test_split
 # try auto-encoding with keras
 from keras.layers import Input, Dense
 from keras.models import Model
-
-# create logger-file
-import logging
-from datetime import datetime as dt
-
-# compute name for log-file
-now = dt.now()
-logfilename = 'logfile_autoenc_{},{},{},{}.log'.format(now.month, now.day, now.hour, now.minute)
-
-# setup logger
-FORMAT = '%(asctime)-15s %(clientip)s %(user)-8s %(message)s'
-logging.basicConfig(format=FORMAT, level=10, filename = logfilename)
-LOGGER = logging.getLogger()
 
 def main(dim = 70):
     global Local, LOGGER
