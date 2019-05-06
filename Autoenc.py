@@ -1,5 +1,6 @@
 # local flag: train and evaluate locally, or train locally and evaluate online
 Local = True
+Logging = True
 
 # create logger-file
 import logging
@@ -12,7 +13,11 @@ logfilename = 'logfile_autoenc_{}_{}_{}_{}.log'.format(now.month, now.day, now.h
 # setup logger
 logging.basicConfig(level=10, filename = logfilename)
 LOGGER = logging.getLogger()
-LOGGER.info('tst')
+
+# if Logging is set to False: override LOGGER.info
+def void(*args, **kwargs): pass
+if not Logging:
+    LOGGER.info = void
 
 # exit()
 # standard imports
@@ -49,12 +54,19 @@ def main(dim = 70):
     # create input layer
     i_layer = Input(shape = (120,))
 
+    # create intermediate encodinglayer
+    interm_dim = 240
+    interm_enc = Dense(interm_dim), activation = 'sigmoid'(i_layer)
+
     # create encoded layer
     # e_layer = Dense(enc_dim, activation = 'relu')(i_layer)
-    e_layer = Dense(enc_dim)(i_layer)
+    e_layer = Dense(enc_dim)(interm_enc)
+
+    # create intermediate decoding layer
+    interm_dec = Dense(interm_dim, activation = 'sigmoid')(e_layer)
 
     # create decoded layer
-    d_layer = Dense(120, activation = 'sigmoid')(e_layer)
+    d_layer = Dense(120, activation = 'sigmoid')(interm_dec)
 
     # create auto-encoder, the model that maps input straight to output
     auto_encoder = Model(i_layer, d_layer)
@@ -129,5 +141,6 @@ def main(dim = 70):
         print('Done')
 
 if __name__ == '__main__':
-    for i in range(20, 100, 2):
-        main(i)
+    main(80)
+    # for i in range(20, 100, 2):
+    #     main(i)
