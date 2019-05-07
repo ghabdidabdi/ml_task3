@@ -1,6 +1,6 @@
 # local flag: train and evaluate locally, or train locally and evaluate online
 Local = True
-Logging = True
+Logging = False
 
 # create logger-file
 import logging
@@ -32,7 +32,7 @@ from sklearn.model_selection import train_test_split
 from keras.layers import Input, Dense
 from keras.models import Model
 
-def main(dim = 70):
+def main(dim = 84):
     global Local, LOGGER
 
     LOGGER.info('starting main for {} dimensions'.format(dim))
@@ -54,8 +54,8 @@ def main(dim = 70):
     # create input layer
     i_layer = Input(shape = (120,))
 
-    # create intermediate encodinglayer
-    interm_dim = 240
+    # create intermediate encoding layer
+    interm_dim = 480
     interm_enc = Dense(interm_dim, activation = 'sigmoid')(i_layer)
 
     # create encoded layer
@@ -83,7 +83,7 @@ def main(dim = 70):
     # NOTE: we encode our entire X!
     auto_encoder.compile(optimizer = 'adadelta', loss = 'binary_crossentropy')
     auto_encoder.fit(X, X,
-                    epochs = 100
+                    epochs = 500
     )
 
     # and now we can encode our data:
@@ -114,7 +114,7 @@ def main(dim = 70):
                 loss='sparse_categorical_crossentropy',
                 metrics=['accuracy'])
     #
-    model.fit(X_train, y_train, epochs = 200)
+    model.fit(X_train, y_train, epochs = 1000)
 
     LOGGER.info('Done, {} now'.format('evaluating' if Local else 'predicting'))
 
@@ -141,6 +141,6 @@ def main(dim = 70):
         print('Done')
 
 if __name__ == '__main__':
-    main(80)
+    main(84)
     # for i in range(20, 100, 2):
     #     main(i)
