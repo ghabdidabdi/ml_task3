@@ -60,13 +60,13 @@ def main(dim = 84):
 
     # create encoded layer
     # e_layer = Dense(enc_dim, activation = 'relu')(i_layer)
-    e_layer = Dense(enc_dim)(interm_enc)
+    e_layer = Dense(enc_dim, activation = 'sigmoid')(interm_enc)
 
     # create intermediate decoding layer
     interm_dec = Dense(interm_dim, activation = 'sigmoid')(e_layer)
 
     # create decoded layer
-    d_layer = Dense(120, activation = 'sigmoid')(interm_dec)
+    d_layer = Dense(120)(interm_dec)
 
     # create auto-encoder, the model that maps input straight to output
     auto_encoder = Model(i_layer, d_layer)
