@@ -57,8 +57,8 @@ def hyper(dim: int, depth: int, width: int):
     y = train.pop('y').values
     test = test.values
 
-    Scalar = StandardScaler()
-    X = Scalar.fit_transform(X)
+    Scaler = StandardScaler()
+    X = Scaler.fit_transform(X)
     test = Scaler.transform(test)
 
     enc_dim = dim # enc_dim: dimension to encode to
