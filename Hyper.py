@@ -95,7 +95,7 @@ def hyper(dim: int, depth: int, width: int):
     # NOTE: we encode our entire X!
     auto_encoder.compile(optimizer = 'adadelta', loss = 'binary_crossentropy')
     auto_encoder.fit(X, X,
-                    epochs = 75
+                    epochs = 25
     )
 
     # and now we can encode our data:
@@ -134,7 +134,7 @@ def hyper(dim: int, depth: int, width: int):
         , metrics=['accuracy']
     )
 
-    model.fit(X_train, y_train, epochs = 200)
+    model.fit(X_train, y_train, epochs = 100)
 
     LOGGER.info('Done, {} now'.format('evaluating' if Local else 'predicting'))
 
