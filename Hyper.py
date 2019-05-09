@@ -166,9 +166,9 @@ def hyper(dim: int, depth: int, width: int):
 def search():
     '''search over our hyperparameters for something maybe usefull'''
     # generate ranges for our hyper-params
-    r_dim = list(range(40, 121, 10))
-    r_width = list(range(40, 481, 40))
-    r_depth = list(range(1, 10))
+    r_dim = list(range(40, 121, 15))
+    r_width = list(range(40, 481, 80))
+    r_depth = list(range(1, 10, 2))
 
     # generate permutations
     cross = [
