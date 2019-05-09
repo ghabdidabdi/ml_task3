@@ -183,20 +183,20 @@ def search():
     hyper_db = pd.DataFrame(columns = ['dim', 'width', 'depth', 'acc', 'loss'])
     for (di, wi, de) in cross:
         # wrapped in try just to make sure
-        # try:
-        loss, acc = hyper(di, wi, de)
-        # open db
-        conn = sqlite3.connect('hyper.db')
-        c = conn.cursor()
-        # insert results
-        query = 'INSERT INTO performances VALUES ({}, {}, {}, {}, {});'.format(di, wi, de, loss, acc)
-        c.execute(query)
-        # close connection
-        conn.commit()
-        conn.close()
-        # except Exception:
-        #     print('error for params: {}, {}, {}'.format(di, wi, de))
-        #     quicksend('error for params: {}, {}, {}'.format(di, wi, de))
+        try:
+            loss, acc = hyper(di, wi, de)
+            # open db
+            conn = sqlite3.connect('hyper.db')
+            c = conn.cursor()
+            # insert results
+            query = 'INSERT INTO performances VALUES ({}, {}, {}, {}, {});'.format(di, wi, de, loss, acc)
+            c.execute(query)
+            # close connection
+            conn.commit()
+            conn.close()
+        except Exception:
+            print('error for params: {}, {}, {}'.format(di, wi, de))
+            quicksend('error for params: {}, {}, {}'.format(di, wi, de))
 
 if __name__ == '__main__':
     quicksend('starting now')
