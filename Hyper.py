@@ -143,7 +143,7 @@ def hyper(dim: int, depth: int, width: int):
         # if local is set to True: evluate on local data
         results = model.evaluate(X_test, y_test)
         print("done :D")
-        quicksend("done :D, for: {}, {}, {}".format(dim, depth, width))
+        quicksend("done :D, for: {}, {}, {}:".format(dim, depth, width))
         print(results)
         quicksend(results)
 
