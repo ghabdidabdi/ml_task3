@@ -33,14 +33,13 @@ from sklearn.model_selection import train_test_split
 from keras.layers import Input, Dense
 from keras.models import Model
 
-# if Logging is set to False: override LOGGER.info
-def void(*args, **kwargs): pass
+# if Logging is set to False: only log 50 and higher
 if not Logging:
-    LOGGER.info = void
+    logging.basicConfig(level=50, filename = logfilename)
 else:
-    # otherwise setup logger
+    # otherwise setup logger for 10 and highger
     logging.basicConfig(level=10, filename = logfilename)
-    LOGGER = logging.getLogger()
+LOGGER = logging.getLogger()
 
 def hyper(dim: int, depth: int, width: int):
     LOGGER.info('starting main for {} dimensions'.format(dim))
@@ -115,26 +114,26 @@ def hyper(dim: int, depth: int, width: int):
     ################################################
     # # # create model from given hyper-params # # #
     ################################################
-    # TODO
     # array of layers, first layer takes enc_dim inputs
     layerz = [keras.layers.Dense(dim, activation=tf.nn.relu, input_dim = enc_dim)]
     for i in range(1, depth):
         layerz.append(keras.layers.Dense(dim, activation=tf.nn.relu, input_dim = dim))
     # append last layer, that only outputs 5 weights
-    layerz.append(keras.layers.Dense(5, activation=tf.nn.softmax, input_dim = dim))
+    layerz.append(keras.layers.Dense(5, activation=tf.nn.softmax))
+    # keras.layers.Dense(5, activation=tf.nn.softmax)
 
     # Model 2 from earlier
     model = keras.Sequential(layerz)
-    model.name = 'model_hyper_{}_{}_{}'.format(dim, depth, width)
+    model.name = 'hyper_{}_{}_{}'.format(dim, depth, width)
 
     model.compile(
         optimizer='adam'
-        , loss='categorical_crossentropy'
+        , loss='sparse_categorical_crossentropy'
         # , loss='sparse_categorical_crossentropy'
         # NOTE: is this the correct metrics?
         , metrics=['accuracy']
     )
-    #
+
     model.fit(X_train, y_train, epochs = 200)
 
     LOGGER.info('Done, {} now'.format('evaluating' if Local else 'predicting'))
@@ -173,7 +172,8 @@ def search():
 
     # generate permutations
     cross = [
-        (i, j, k) for i in r_dim
+        (i, j, k)
+        for i in r_dim
         for j in r_width
         for k in r_depth
     ]
@@ -183,26 +183,23 @@ def search():
     hyper_db = pd.DataFrame(columns = ['dim', 'width', 'depth', 'acc', 'loss'])
     for (di, wi, de) in cross:
         # wrapped in try just to make sure
-        try:
-            loss, acc = hyper(di, wi, de)
-            # open db
-            conn = sqlite3.connect('hyper.db')
-            c = conn.cursor()
-            # insert results
-            query = 'INSERT INTO performances VALUES ({}, {}, {}, {}, {});'.format(di, wi, de, loss, acc)
-            c.execute(query)
-            # close connection
-            conn.commit()
-            conn.close()
-        except Exception:
-            print('error for params: {}, {}, {}'.format(di, wi, de))
-            quicksend('error for params: {}, {}, {}'.format(di, wi, de))
+        # try:
+        loss, acc = hyper(di, wi, de)
+        # open db
+        conn = sqlite3.connect('hyper.db')
+        c = conn.cursor()
+        # insert results
+        query = 'INSERT INTO performances VALUES ({}, {}, {}, {}, {});'.format(di, wi, de, loss, acc)
+        c.execute(query)
+        # close connection
+        conn.commit()
+        conn.close()
+        # except Exception:
+        #     print('error for params: {}, {}, {}'.format(di, wi, de))
+        #     quicksend('error for params: {}, {}, {}'.format(di, wi, de))
 
 if __name__ == '__main__':
-    quicksend('starting now, in')
-    quicksend('3')
-    quicksend('2')
-    quicksend('1')
+    quicksend('starting now')
     search()
     LOGGER.info('all done')
     quicksend('all done')
