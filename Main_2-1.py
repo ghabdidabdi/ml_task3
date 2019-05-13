@@ -48,7 +48,7 @@ model.add(Dense(5, activation='softmax'))
 
 model.compile(loss='categorical_crossentropy', optimizer='Nadam', metrics=['accuracy'])
 
-model.fit(X, y, batch_size=batch_size, epochs=200, verbose=1)
+model.fit(X, y, batch_size=batch_size, epochs=2000, verbose=1)
 
 dataYPredict = model.predict(test)
 y_pred = np.argmax(dataYPredict, axis=1)
