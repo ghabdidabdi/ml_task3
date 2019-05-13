@@ -6,6 +6,9 @@ import keras
 from keras.utils import np_utils
 from sklearn.decomposition import PCA
 
+try: from tele_utils import quicksend, quicksend_file
+except Exception: pass
+
 train = pd.read_hdf("train.h5", "train")
 test = pd.read_hdf("test.h5", "test")
 
@@ -47,11 +50,17 @@ model.add(Dense(5, activation='softmax'))
 model.compile(loss='categorical_crossentropy', optimizer='Nadam', metrics=['accuracy'])
 
 # model.fit(X, y, batch_size=batch_size, epochs=2000, verbose=1)
-model.fit(X_test, y_test, batch_size=batch_size, epochs=2000, verbose=1)
+model.fit(X_test, y_test, batch_size=batch_size, epochs=1000, verbose=1)
 
 perf = model.evaluate(X_test, y_test)
 print('done')
 print(perf)
+
+try:
+    quicksend('done')
+    quicksend(perf)
+except Exception: pass
+
 exit()
 
 dataYPredict = model.predict(test)
