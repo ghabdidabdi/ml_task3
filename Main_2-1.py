@@ -5,6 +5,8 @@ import pandas as pd
 import keras
 from keras.utils import np_utils
 from sklearn.decomposition import PCA
+# local testing
+from sklearn.model_selection import train_test_split
 
 try: from tele_utils import quicksend, quicksend_file
 except Exception: pass
