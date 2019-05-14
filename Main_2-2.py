@@ -59,24 +59,23 @@ model.add(Dense(5, activation='softmax'))
 
 model.compile(loss='categorical_crossentropy', optimizer='Nadam', metrics=['accuracy'])
 
-# model.fit(X, y, batch_size=batch_size, epochs=2000, verbose=1)
-model.fit(X_train, y_train, batch_size=batch_size, epochs=2000, verbose=1)
+model.fit(X, y, batch_size=batch_size, epochs=1000, verbose=1)
+# model.fit(X_train, y_train, batch_size=batch_size, epochs=1000, verbose=1)
 
-perf = model.evaluate(X_test, y_test)
-print('done')
-print(perf)
+# perf = model.evaluate(X_test, y_test)
+# print('done')
+# print(perf)
 
-try:
-    quicksend('done')
-    quicksend(perf)
-except Exception: pass
-
-exit()
-model.fit(X, y, batch_size=batch_size, epochs=500, verbose=1)
+# try:
+#     quicksend('done')
+#     quicksend(perf)
+# except Exception: pass
 
 dataYPredict = model.predict(test)
 y_pred = np.argmax(dataYPredict, axis=1)
 
 resf = pd.DataFrame({'Id': index, 'y': y_pred})
-resf.to_csv('res_2-3.csv', index = False)
+resf.to_csv('res_hopefully_last_one_like_srsly.csv', index = False)
 print('Done')
+try: quicksend('done now, yayyyy!!!')
+except Exception: pass
