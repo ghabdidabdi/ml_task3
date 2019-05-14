@@ -59,7 +59,11 @@ model.add(Dense(5, activation='softmax'))
 
 model.compile(loss='categorical_crossentropy', optimizer='Nadam', metrics=['accuracy'])
 
-model.fit(X, y, batch_size=batch_size, epochs=1000, verbose=1)
+for i in range(1, 5):
+    model.fit(X, y, batch_size=batch_size, epochs=250, verbose=1)
+    try: quicksend('{} iterations done'.format(250 * i))
+    except Exception: pass
+
 # model.fit(X_train, y_train, batch_size=batch_size, epochs=1000, verbose=1)
 
 # perf = model.evaluate(X_test, y_test)
