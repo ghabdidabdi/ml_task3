@@ -61,6 +61,10 @@ model.compile(loss='categorical_crossentropy', optimizer='Nadam', metrics=['accu
 
 for i in range(1, 5):
     model.fit(X, y, batch_size=batch_size, epochs=250, verbose=1)
+    dataYPredict = model.predict(test)
+    y_pred = np.argmax(dataYPredict, axis=1)
+    resf = pd.DataFrame({'Id': index, 'y': y_pred})
+    resf.to_csv('res_hopefully_last_one_like_srsly_{}_iter.csv'.format(250 * i), index = False)
     try: quicksend('{} iterations done'.format(250 * i))
     except Exception: pass
 
