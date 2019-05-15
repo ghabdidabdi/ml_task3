@@ -123,6 +123,6 @@ for i in range(1, 11):
 
     resf = pd.DataFrame({'Id': index, 'y': y_pred})
     resf.to_csv('res_model_avg_{}_iter.csv'.format(i * 100), index = False)
-    print('Done with {} iterations'.format(i * 100))
-    try: quicksend('Done with {} iterations'.format(i * 100))
+    print('maniggli done with {} iterations'.format(i * 100))
+    try: quicksend('maniggli done with {} iterations'.format(i * 100))
     except Exception: pass
